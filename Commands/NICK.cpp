@@ -46,19 +46,17 @@ void NICK::execute(Server& server, Client& client) {
 	client.setNickName(this->_cmdSource[1]);
 }
 
-string NICK::makeNumericMsg(Server& server, Client& client, int num) {
-	stringstream ss;
+string NICK::makeNumericMsg(Server& server, Client& client, const char *num) {
 	string res = "";
-	ss << num;
 
 	static_cast<void>(server);
 	// res += ":" + server.getHostName() + " ";
-	res += string(":") + "server" + " " + ss.str() + " ";
-	if (num == ERR_NONICKNAMEGIVEN) {
+	res += string(":") + "server" + " " + num + " ";
+	if (string(num) == string(ERR_NONICKNAMEGIVEN)) {
 		res += client.getNickName() + " " + ":No nickname given" + "\r\n";
-	} else if (num == ERR_ERRONEUSNICKNAME) {
+	} else if (string(num) == string(ERR_ERRONEUSNICKNAME)) {
 		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Erroneus nickname" + "\r\n";
-	} else if (num == ERR_NICKNAMEINUSE) {
+	} else if (string(num) == string(ERR_NICKNAMEINUSE)) {
 		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Nickname is already in use" + "\r\n";
 	}
 	return res;
