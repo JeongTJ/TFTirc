@@ -88,10 +88,16 @@ void	Server::run()
 			}
 			else if (curr_event->filter == EVFILT_WRITE)
 			{
-				Client* cl = getClient(curr_event->ident);
-				Command* cmd = this->_command_controller.makeCommand(*cl);
-				if (cmd != NULL)
-					cmd->execute(*this, *cl);
+				while (1) {
+					Client* cl = getClient(curr_event->ident);
+					if (cl == NULL)
+						break ;
+					Command* cmd = this->_command_controller.makeCommand(*cl);
+					if (cmd == NULL)
+						break ;
+					if (cmd != NULL)
+						cmd->execute(*this, *cl);
+				}
 			}
 		}
 	}
