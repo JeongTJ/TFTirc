@@ -25,7 +25,7 @@ using namespace std;
 class Server
 {
 	public:
-		Server(int port, string password);
+		Server(long port, string password);
 		~Server();
 
 		void		run();
