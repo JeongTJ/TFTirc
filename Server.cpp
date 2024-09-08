@@ -6,8 +6,10 @@
 #include "Server.hpp"
 #include "Command.hpp"
 
-Server::Server(int port, string password) :  _command_controller(CommandController()), _password(password), _name(HOST), _port(port), _socket(-1)
+Server::Server(long port, string password) :  _command_controller(CommandController()), _password(password), _name(HOST), _port(port), _socket(-1)
 {
+	if (!(0 < port && port < 65536))
+		handle_error("invalid port");
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		handle_error("Server Socket error");
 
@@ -86,10 +88,16 @@ void	Server::run()
 			}
 			else if (curr_event->filter == EVFILT_WRITE)
 			{
-				Client* cl = getClient(curr_event->ident);
-				Command* cmd = this->_command_controller.makeCommand(*cl);
-				if (cmd != NULL)
-					cmd->execute(*this, *cl);
+				while (1) {
+					Client* cl = getClient(curr_event->ident);
+					if (cl == NULL)
+						break ;
+					Command* cmd = this->_command_controller.makeCommand(*cl);
+					if (cmd == NULL)
+						break ;
+					if (cmd != NULL)
+						cmd->execute(*this, *cl);
+				}
 			}
 		}
 	}
